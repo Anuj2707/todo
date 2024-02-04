@@ -1,0 +1,87 @@
+import React, { useState } from 'react';
+import "./TodoList.css"; 
+
+
+function TodoList() {
+  const [tasks, setTasks] = useState([]);
+  const [taskInput, setTaskInput] = useState('');
+  const [selectedTasks, setSelectedTasks] = useState([]);
+
+  const handleInputChange = (event) => {
+    setTaskInput(event.target.value);
+  };
+
+  const handleAddTask = () => {
+    if (taskInput.trim() !== '') {
+      const newTask = {
+        content: taskInput.trim(),
+        completed: false,
+        creationDate: new Date().toLocaleString() // Include creation date
+      };
+      setTasks([...tasks, newTask]);
+      setTaskInput('');
+    }
+  };
+
+  const handleDeleteTask = () => {
+    const updatedTasks = tasks.filter((_, index) => !selectedTasks.includes(index));
+    setTasks(updatedTasks);
+    setSelectedTasks([]);
+  };
+
+  const handleClearTasks = () => {
+    setTasks([]);
+  };
+
+  const handleCheckboxChange = (index) => {
+    if (selectedTasks.includes(index)) {
+      setSelectedTasks(selectedTasks.filter((i) => i !== index));
+    } else {
+      setSelectedTasks([...selectedTasks, index]);
+    }
+  };
+
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      handleAddTask();
+    }
+  };
+
+  return (
+    <div className='container'>
+      <h1>To-do List</h1>
+      <div className='content'>
+        <div className='display'>
+          <ul>
+            {tasks.map((task, index) => (
+              <li key={index}>
+                <input
+                  type="checkbox"
+                  checked={selectedTasks.includes(index)}
+                  onChange={() => handleCheckboxChange(index)}
+                />
+                <span className={task.completed ? 'completed' : ''}>{task.content}</span>
+                <span className="creation-date">{task.creationDate}</span> {/* Display creation date */}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <input 
+          type='text' 
+          placeholder='Enter Your Task' 
+          className="form-control mb-2" 
+          value={taskInput}
+          onChange={handleInputChange}
+          onKeyPress={handleKeyPress}
+        />
+        <div className='button-group d-flex justify-content-between'>
+        <button type="button" class="btn btn-outline-success"onClick={handleAddTask}>Add</button>
+        <button type="button" class="btn btn-outline-warning" onClick={handleClearTasks}>Clear</button>
+        <button type="button" class="btn btn-outline-danger" onClick={handleDeleteTask}>Delete</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default TodoList;

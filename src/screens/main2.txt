@@ -1,0 +1,105 @@
+import React, { useState } from 'react';
+import "./TodoList.css"; 
+
+function TodoList() {
+  const [tasks, setTasks] = useState([]);
+  const [completedTasks, setCompletedTasks] = useState([]);
+  const [taskInput, setTaskInput] = useState('');
+  const [selectedTasks, setSelectedTasks] = useState([]);
+
+  const handleInputChange = (event) => {
+    setTaskInput(event.target.value);
+  };
+
+  const handleAddTask = () => {
+    if (taskInput.trim() !== '') {
+      const newTask = {
+        content: taskInput.trim(),
+        completed: false,
+        creationDate: new Date().toLocaleString() // Include creation date
+      };
+      setTasks([...tasks, newTask]);
+      setTaskInput('');
+    }
+  };
+
+  const handleDeleteTask = () => {
+    const updatedTasks = tasks.filter((_, index) => !selectedTasks.includes(index));
+    setTasks(updatedTasks);
+    setSelectedTasks([]);
+  };
+
+  const handleClearTasks = () => {
+    setTasks([]);
+  };
+
+  const handleCheckboxChange = (index) => {
+    const updatedTasks = tasks.map((task, i) => {
+      if (i === index) {
+        const updatedTask = { ...task, completed: !task.completed };
+        if (updatedTask.completed) {
+          setCompletedTasks([...completedTasks, updatedTask]);
+          return null; // Mark the task for removal
+        }
+        return updatedTask;
+      }
+      return task;
+    }).filter(task => task !== null); // Filter out null tasks
+    setTasks(updatedTasks);
+  };
+
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      handleAddTask();
+    }
+  };
+
+  return (
+    <div className='container'>
+      <h1>To-do List</h1>
+      <div className='content'>
+        <div className='display'>
+          <ul>
+            {tasks.map((task, index) => (
+              <li key={index}>
+                <input
+                  type="checkbox"
+                  checked={task.completed}
+                  onChange={() => handleCheckboxChange(index)}
+                />
+                <span className={task.completed ? 'completed' : ''}>{task.content}</span>
+                <span className="creation-date">{task.creationDate}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className='display'>
+          <h2>Completed Tasks</h2>
+          <ul>
+            {completedTasks.map((task, index) => (
+              <li key={index}>
+                <span className='completed'>{task.content}</span>
+                <span className="creation-date">{task.creationDate}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <input 
+          type='text' 
+          placeholder='Enter Your Task' 
+          className="form-control mb-2" 
+          value={taskInput}
+          onChange={handleInputChange}
+          onKeyPress={handleKeyPress}
+        />
+        <div className='button-group d-flex justify-content-between'>
+          <button type="button" className="btn btn-outline-success" onClick={handleAddTask}>Add</button>
+          <button type="button" className="btn btn-outline-warning" onClick={handleClearTasks}>Clear</button>
+          <button type="button" className="btn btn-outline-danger" onClick={handleDeleteTask}>Delete</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default TodoList;
